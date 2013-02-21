@@ -4,25 +4,35 @@ import NWCK
 import Text.Printf
 import System.Environment(getArgs)
 import qualified Data.Text as T
+import Data.String.Utils
 
 main:: IO ()
 main = do
     (datasetF:resultF:_) <- getArgs
     rawDataset <- readFile datasetF
-    let dataset   = filter (\x -> x /= "" || x /= "\r") $ lines rawDataset
+    let dataset   = stripAndFold $ lines rawDataset
     let triadList = makeTriad dataset
-    let result = unwords $ map ( printf "%0.f" . (maybe (-1.0) id)) $ evalTriad triadList
+    let result = unwords $ map ( show . (maybe (999) id)) $ evalTriad triadList
     writeFile resultF result
+
+
+stripAndFold::[String] -> [String]
+stripAndFold = foldr dropIfBlank []
+    where
+        dropIfBlank s c
+            | null nS = c
+            | otherwise = s : c
+                where nS = strip s
 
 makeTriad::[String] -> [(Either String NWTree,T.Text,T.Text)]
 makeTriad [] = []
 makeTriad (t:ab:xs) = (parseNWK (T.pack t),T.pack a, T.pack b): makeTriad xs 
     where
-        (a:b:_) = words ab
+        [a,b] = words ab
 
-evalTriad:: [(Either String NWTree,T.Text,T.Text)] -> [Maybe Double]
+evalTriad:: [(Either String NWTree,T.Text,T.Text)] -> [Maybe Integer]
 evalTriad = map evl
 
-evl::(Either String NWTree,T.Text,T.Text) -> Maybe Double
-evl ((Right t),a,b) = fmap pathCost $ pathFromAtoB t a b
+evl::(Either String NWTree,T.Text,T.Text) -> Maybe Integer
+evl ((Right t),a,b) = fmap pathCost $ pathFromAtoB (uniqueLabels t) a b
 evl ((Left s),_,_)  = error s

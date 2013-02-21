@@ -6,12 +6,31 @@ import Data.Attoparsec.Combinator
 import qualified Data.Text as T
 import Data.Tree
 import Control.Applicative
-import Data.Time.Clock
-import System.IO.Unsafe(unsafePerformIO)
-import System.Random
 
-stdWeight::Double
-stdWeight = 1.0
+import Control.Monad.State
+import Data.Traversable (traverse)
+
+uniqueLabels:: NWTree -> NWTree
+uniqueLabels t = head $ uniqueLabelsF [t]
+
+uniqueLabelsF::Forest (T.Text,Integer) -> Forest (T.Text,Integer)
+uniqueLabelsF f = evalState (mapM globalAction f) 0
+    where
+        globalAction t = unwrapMonad $ traverse localAction t
+        localAction (t,v) = WrapMonad $ do
+            i <- get
+            put (i+1)
+            let newValue = if t == internalStdLabel then (T.pack (show i),v) else (t,v)
+            return newValue 
+
+stdWeight::Integer
+stdWeight = 1
+
+ts::T.Text
+ts = T.pack "((,,),,castor)root;"
+
+fromRight (Right s) = s
+fromRight (Left _)  = error "You said you were sure, it's not my fault!"
 
 sample1 = T.pack "((Acanthoscurria_saiga,(Ephibolus_gebleri,Leptobrachium_squamatus)),(((((((((Acanthoscurria_unicolor,(Chlamydotis_penelope,Saga_angustirostris)),Riparia_ciliatus),Mabuya_collectivus),(((((((((((((((((((((((Anthropoidae_fissipes,((Buthacus_weberi,(Ophisops_vittatus,Pandinus_acuta)),(((Pachydactylus_scalaris,crecca_brachydactyla),Riparia_krueperi),Pica_coelestinus))),Underwoodisaurus_catenifer),Regulus_alpina),Aphonopelma_caudata),(Lepidobatrachus_decorus,Scolopendra_triangulum)),Apus_chuatsi),(Gyps_leucocephala,Telescopus_canorus)),((Chlamydotis_tenuirostris,(Homopholis_ibis,Phrynohyas_alba)),Hydrochelidon_rutilans)),((Aquila_sibiricus,Seokia_sauromates),Certhia_barbata)),Moschus_bimaculata),(Dipus_corone,((Leptobrachium_avicularia,(((Leptopelis_striatus,Pagophila_nigra),(Morelia_sudanensis,Thymallus_brongersmai)),Rhacodactylus_rapax)),Ziphius_temminskii))),Lagenorhynchus_epops),(Hottentotta_graculus,(Prunella_flavomaculatus,Tropidurus_falcipennis))),Larus_glaucescens),Dafila_keyzerlingii),(Rhinolophus_atthis,Squaterola_javanica)),Citharacanthus_ochropus),Ctenosaura_altaicus),(((((Avicularia_dentatus,(Nyctixalus_alpinus,Vulpanser_viridescens)),Pseudorca_gratiosa),(((Dipus_truncatus,((((Litoria_krueperi,(Odobenus_lavaretus,Rhesus_vertebralis)),Thymallus_pygargus),Nemorhaedus_collectivus),((Otocoris_jubata,Physignathus_licin),Testudo_tristis))),Pandinus_multituberculatus),(Lamprolepis_subglobosa,((Myotis_tetrix,Rissa_cinaedus),Tetrao_scabra)))),Phoca_lepturus),Bos_mlokosiewiczi)),Apodora_kazanakowi),Trachemys_gibbosus),(Eurynorhynchus_constrictor,(Onychodactylus_lutris,Theloderma_parreyssi))),Panthera_marcianus)),Caiman_schokari),(Mesoplodon_longipennis,Varanus_floridana)),Chelus_quinquetaeniata),((((Anthropoides_celer,(Megaloperdix_taezanowskyi,Minipterus_morinellus)),Chrttusia_crassidens),Rhabdophis_limosa),Phrynops_leschenaultii)),Aquila_multituberculatus),((Anolis_filipjevi,Boiga_zagrosensis),(Mustela_arenarius,Streptopelia_turtur)));"
 s1a = T.pack "Pica_coelestinus"
@@ -21,17 +40,22 @@ sample2 = T.pack "(Abantias_leucophyllata,((((((((((((((((Acanthoceros_maurus,((
 s2a = T.pack "Castor_nigra"
 s2b = T.pack "Madagascarophis_decorus"
 
--- NEWICK Tree parsing -- 
+rootStdLabel::T.Text
+rootStdLabel = T.pack "*"
 
-type RPath  = [(T.Text,Double)]
-type NWTree = Tree (T.Text,Double)
+internalStdLabel::T.Text
+internalStdLabel = T.pack "^"
+
+-- NEWICK Tree parsing -- 
+type RPath  = [(T.Text,Integer)]
+type NWTree = Tree (T.Text,Integer)
 
 parseNWK:: T.Text -> Either String NWTree
 parseNWK = parseOnly nwTree
 
 nwTree = do
     forest <- descendant_list
-    rl <- option (T.pack ((show (utctDayTime (unsafePerformIO (getCurrentTime)))) ++ (show (unsafePerformIO (randomIO::IO Integer))))) label
+    rl <- option (rootStdLabel) label
     rL <- option stdWeight edgeLength
     char ';'
     return $ Node (rl,rL) forest
@@ -47,7 +71,7 @@ subtree = internal <|> leaf
 -- Working -- 
 edgeLength = do
     char ':'
-    n <- signed double
+    n <- signed decimal
     return n
 
 label = do
@@ -56,14 +80,14 @@ label = do
 
 -- Working -- 
 internal = do
-    forest <- descendant_list
-    nl <- option (T.pack ((show (utctDayTime (unsafePerformIO (getCurrentTime)))) ++ (show (unsafePerformIO (randomIO::IO Integer))))) label
+    forest <- descendant_list 
+    nl <- option internalStdLabel label
     nL <- option stdWeight edgeLength
     return $ Node (nl,nL) forest
 
 -- Working --
 leaf = do
-    nl <- option (T.pack ((show (utctDayTime (unsafePerformIO (getCurrentTime)))) ++ (show (unsafePerformIO (randomIO::IO Integer))))) label
+    nl <- option internalStdLabel label
     nL <- option stdWeight edgeLength
     return $ Node (nl,nL) []
 
@@ -99,6 +123,6 @@ path a@(x:xs) b@(y:ys)
     | x /= y = a ++ b
     | otherwise = path xs ys
 
-pathCost::RPath -> Double
-pathCost p  = foldr ((+) . snd ) 0.0 p
+pathCost::RPath -> Integer
+pathCost p  = foldr ((+) . snd ) 0 p
 -- [END] Path finding --
