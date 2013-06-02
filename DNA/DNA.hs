@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeSynonymInstances , FlexibleInstances #-}
-module CountingNucleotides (
+module DNA (
     computeNucFreq
     ) where
 
