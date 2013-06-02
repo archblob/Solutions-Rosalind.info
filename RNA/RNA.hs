@@ -1,6 +1,6 @@
-module RNATranscription (
-    transcribeDNAtoRNA
-    ) where
+module RNA (
+   transcribeDNAtoRNA
+ ) where
 
 -- [1] Simple implementation
 
@@ -10,8 +10,8 @@ type RNAString = String
 transcribeNuc:: Char -> Char
 transcribeNuc n =
     case n of
-        'T' -> 'U'
-        _   ->  n
+      'T' -> 'U'
+      _   ->  n
 
 transcribeDNAtoRNA:: DNAString -> RNAString
 transcribeDNAtoRNA = map transcribeNuc
