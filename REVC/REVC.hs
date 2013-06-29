@@ -1,4 +1,4 @@
-module ReverseComplement (
+module REVC (
     reverseComplement
     ) where
 
