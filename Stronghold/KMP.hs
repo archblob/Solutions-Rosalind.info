@@ -1,4 +1,4 @@
-module FailureArray where
+module KMP where
 
 import qualified Data.Vector.Unboxed as V
 import qualified Data.ByteString.Char8 as B

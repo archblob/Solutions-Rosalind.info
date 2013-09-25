@@ -1,4 +1,9 @@
-module CONV where
+module CONV 
+      readSets
+    , readFloatList
+    , minkowskiDifference
+    , maxMult
+    ) where
 
 import qualified Data.MultiSet as DM
 import Numeric

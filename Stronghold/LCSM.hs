@@ -1,5 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
-module SharedMotif where
+module LCSM where
 
 import qualified Data.Vector as V
 

@@ -1,4 +1,6 @@
-module Main(main) where
+module MRNA (
+    main
+    ) where
 
 import System.Environment(getArgs)
 import Rosalindlib.MRNA

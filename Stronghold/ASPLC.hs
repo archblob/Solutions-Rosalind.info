@@ -1,4 +1,8 @@
-module ASPLC where
+module ASPLC (
+      factorial
+    , combinations
+    , combSum
+    ) where
 
 --factorial:: (Eq a , Num a) => a -> a
 factorial n = go n 1

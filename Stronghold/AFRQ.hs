@@ -1,4 +1,7 @@
-module AFRQ where
+module AFRQ (
+      calcProbs
+    , showProbs
+    ) where
 
 import Text.Printf
 

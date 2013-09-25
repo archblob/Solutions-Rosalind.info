@@ -1,4 +1,9 @@
-module CORR where
+module CORR (
+      hammingDistance
+    , reverseComplement
+    , errorCorrection
+    , corrMapToString
+    ) where
 
 import qualified Data.ByteString.Char8 as B
 import qualified Data.Map as M

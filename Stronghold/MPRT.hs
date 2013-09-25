@@ -1,4 +1,6 @@
-module Main(main) where
+module MPRT (
+    main
+    ) where
 
 import System.Environment(getArgs)
 import Network.HTTP

@@ -1,4 +1,4 @@
-module EnumeratingGeneOrders (
+module PERM (
     writePerm
     ) where
 

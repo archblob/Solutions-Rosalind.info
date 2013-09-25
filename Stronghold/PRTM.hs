@@ -1,4 +1,4 @@
-module ProteinMass (
+module PRTM (
       computePMass
     , sampleDataset
     ) where

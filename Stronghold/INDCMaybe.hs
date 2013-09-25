@@ -1,4 +1,4 @@
-module INDC where
+module INDCMaybe where
 
 factorial::Integer -> Integer
 factorial = fact 1

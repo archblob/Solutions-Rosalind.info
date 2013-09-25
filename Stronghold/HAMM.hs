@@ -1,4 +1,4 @@
-module CountingPointMutations (
+module HAMM (
       countPointMutations
     , countForSamples
     ) where

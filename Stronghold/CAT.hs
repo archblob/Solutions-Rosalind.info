@@ -1,4 +1,6 @@
-module CAT where
+module CAT (
+    cat
+    ) where
 
 import qualified Data.ByteString.Char8 as B
 import Data.MemoCombinators (memo2,integral)

@@ -1,4 +1,4 @@
-module ConsensusProfile (
+module ConsensusAndProfile (
       listProfile
     , showProfile
     , Dataset

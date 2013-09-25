@@ -1,4 +1,4 @@
-module OpenReadingFrames (
+module ORF (
       orf
     , showOrfs
     , DNAString

@@ -1,4 +1,7 @@
-module CSTR where
+module CSTR (
+      cstr
+    , trivial
+    ) where
 
 import Data.List
 

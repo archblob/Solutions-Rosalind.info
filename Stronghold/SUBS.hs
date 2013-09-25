@@ -1,4 +1,4 @@
-module DNAMotif (
+module SUBS (
     findMotif
     ) where
 

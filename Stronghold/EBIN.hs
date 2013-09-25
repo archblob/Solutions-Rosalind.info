@@ -1,4 +1,6 @@
-module Main(main) where
+module Main (
+    main
+    ) where
 
 import System.Environment(getArgs)
 import qualified Data.Vector.Unboxed as V

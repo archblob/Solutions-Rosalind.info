@@ -1,4 +1,4 @@
-module SIGN(
+module SIGN (
       sign
     , listsToString
     ) where

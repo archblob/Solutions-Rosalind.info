@@ -1,4 +1,6 @@
-module Main(main) where
+module TreeComp (
+    main
+    ) where
 
 import Data.Maybe
 import System.Environment(getArgs)
