@@ -2,6 +2,7 @@
 *.hi
 *.chi
 *.chs.h
+Main.hs
 cabal-dev
 .cabal-sandbox
 cabal.sandbox.config
